@@ -1,0 +1,75 @@
+quarkus:
+  http:
+    port: ${PORT:8086}
+    cors:
+      ~: true
+      origins: ${CORS_ORIGINS:http://localhost:5173,https://app.microbio.com}
+      methods: GET,POST,PUT,DELETE,OPTIONS
+      headers: accept,authorization,content-type
+    proxy:
+      proxy-address-forwarding: true
+
+  # OIDC - API Bearer
+  oidc:
+    enabled: false
+
+  # Mongo
+  mongodb:
+    connection-string: ${MONGO_URI:mongodb://localhost:27017}
+    database: ${MONGO_DB:microbio}
+
+  # Cache
+  cache:
+    caffeine:
+      "latest-analysis":
+        initial-capacity: 100
+        maximum-size: 2000
+        expire-after-write: 300S
+
+  # Mailer
+  mailer:
+    from: notifier@microbio.com
+    host: ${SMTP_HOST:smtp.mailtrap.io}
+    port: ${SMTP_PORT:2525}
+    username: ${SMTP_USER:}
+    password: ${SMTP_PASS:}
+    start-tls: REQUIRED
+    mock: ${MAIL_MOCK:false}
+
+  # Health UI + swagger
+  smallrye-openapi:
+    path: /q/openapi
+  swagger-ui:
+    always-include: true
+
+  # Micrometer/Prometheus
+  micrometer:
+    binder:
+      http-client:
+        enabled: true
+    registry:
+      prometheus:
+        step: 60s
+
+# Reactive Messaging Kafka -> Azure Event Hubs (opcional)
+mp:
+  messaging:
+    outgoing:
+      analysis-events-out:
+        connector: smallrye-kafka
+        bootstrap:
+          servers: localhost:29092   # valor dummy
+        enabled: false
+
+
+# Rest Client Keycloak Admin
+keycloak-admin:
+  url: ${OIDC_AUTH_URL}
+  scope: jakarta.enterprise.context.ApplicationScoped
+kc:
+  realm: ${OIDC_REALM:microbiologia}
+  token:
+    url: ${OIDC_AUTH_URL}/realms/${OIDC_REALM:microbiologia}/protocol/openid-connect/token
+  client:
+    id: ${KC_ADMIN_CLIENT_ID:admin-cli}
+    secret: ${KC_ADMIN_CLIENT_SECRET:changeme}

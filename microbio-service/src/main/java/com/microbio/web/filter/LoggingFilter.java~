@@ -1,0 +1,4 @@
+package com.microbio.web.filter;
+
+public class LoggingFilter {
+}

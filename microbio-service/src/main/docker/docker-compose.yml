@@ -1,0 +1,18 @@
+version: "3.8"
+services:
+  mongo:
+    image: mongo:7
+    ports: ["27017:27017"]
+  mongo-express:
+    image: mongo-express:1.0.2
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://mongo:27017/
+    ports: ["8081:8081"]
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0.6
+    command: start-dev
+    environment:
+      KC_HTTP_PORT: 8080
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports: ["8080:8080"]
