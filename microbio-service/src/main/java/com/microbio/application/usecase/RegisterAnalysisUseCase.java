@@ -25,11 +25,22 @@ public class RegisterAnalysisUseCase {
     @Retry(maxRetries = 2, delay = 300)
     public Single<Analysis> execute(Analysis analysis) {
         return analysisRepo.insert(analysis)
-                .flatMap(a -> patientRepo.updateLastAnalysis(a.getPatientId(), a.getId())
-                        .andThen(Single.just(a)))
-                .flatMap(a -> Completable.mergeArray(
-                        notifier.emailAnalysisCreated(a),
-                        notifier.publishAnalysisEvent(a)
-                ).andThen(Single.just(a)));
+                .flatMap(optional -> {
+                    if (optional.isEmpty()) {
+                        return Single.error(new RuntimeException("Analysis insert returned empty Optional"));
+                    }
+                    Analysis a = optional.get();
+
+                    // primero actualiza el paciente
+                    return patientRepo.updateLastAnalysis(a.getPatientId(), a.getId())
+                            .andThen(Single.just(a));
+                })
+                .flatMap(a ->
+                        // luego dispara notificaciones
+                        Completable.mergeArray(
+                                notifier.emailAnalysisCreated(a),
+                                notifier.publishAnalysisEvent(a)
+                        ).andThen(Single.just(a))
+                );
     }
 }

@@ -1,0 +1,9 @@
+kc:
+  token:
+    url: "http://localhost/dummy"
+
+quarkus:
+  http:
+    port: 0
+  test:
+    continuous-testing: disabled

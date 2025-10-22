@@ -4,17 +4,26 @@ import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.containsString;
 
 @QuarkusTest
-class GreetingResourceTest {
+public class GreetingResourceTest {
+
     @Test
-    void testHelloEndpoint() {
+    public void testStatusEndpoint() {
         given()
-          .when().get("/hello")
-          .then()
-             .statusCode(200)
-             .body(is("Hello from Quarkus REST"));
+                .when().get("/status")
+                .then()
+                .statusCode(200)
+                .body("data", containsString("Microbio Service activo"));
     }
 
+    @Test
+    public void testInfoEndpoint() {
+        given()
+                .when().get("/info")
+                .then()
+                .statusCode(200)
+                .body("data", containsString("Microbio Service v1.0.0"));
+    }
 }

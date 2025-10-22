@@ -1,0 +1,5 @@
+# archivo base requerido por Quarkus para cargar application-test.yml
+quarkus:
+  log:
+    category:
+      "com.microbio": INFO
